@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  name                String
+  phone               String         @unique
+  email               String?        @unique
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  deleted_at          DateTime?
+  password_hash       String?
+  has_confirmed_phone Boolean        @default(false)
+  confirmation_token  Int?
+  token_expiration    DateTime?
+  User_company        User_company[]
+  Appointments        Appointments[]
+}
+
+model Company {
+  id                      String         @id @default(uuid())
+  name                    String         @unique
+  service_rules           String?
+  cancellation_grace_time String         @default("00:60:00")
+  created_at              DateTime       @default(now())
+  updated_at              DateTime       @updatedAt
+  deleted_at              DateTime?
+  User_company            User_company[]
+}
+
+enum COMPANY_ROLE {
+  ADMIN
+  EMPLOYEE
+}
+
+model User_company {
+  id             String           @id @default(uuid())
+  user           User             @relation(fields: [user_id], references: [id])
+  company        Company          @relation(fields: [company_id], references: [id])
+  user_id        String
+  company_id     String
+  role           COMPANY_ROLE     @default(EMPLOYEE)
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  deleted_at     DateTime?
+  Appointments   Appointments[]
+  Schedule_rules Schedule_rules[]
+}
+
+model Appointments {
+  id               String       @id @default(uuid())
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  deleted_at       DateTime?
+  name             String
+  time             DateTime
+  cancellation_url String?
+  user_company     User_company @relation(fields: [user_company_id], references: [id])
+  user_company_id  String
+  user             User         @relation(fields: [user_id], references: [id])
+  user_id          String
+}
+
+enum Recurrency_type {
+  DAY_OF_THE_WEEK
+  DATE
+  INTERVAL_OF_DATES
+}
+
+model Schedule_rules {
+  id                       String          @id @default(uuid())
+  user_company             User_company    @relation(fields: [user_companyId], references: [id])
+  user_companyId           String
+  recurrency_type          Recurrency_type
+  dates                    String
+  recurrency_intervals     String
+  start_of_shift           String // 00:00:00
+  end_of_shift             String // 00:00:00
+  duration_per_appointment String // 00:00:00
+  priority                 Int
+  created_at               DateTime        @default(now())
+  updated_at               DateTime        @updatedAt
+  deleted_at               DateTime?
+}

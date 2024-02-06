@@ -1,0 +1,30 @@
+{
+  "name": "projeto-mei",
+  "module": "server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun install && docker compose up -d && bun prisma migrate dev && bun --watch run src/server.ts",
+    "test": "bun vitest run",
+    "test:ui": "bun vitest --ui",
+    "setup": "docker rmi -f projeto-mei-server && docker compose up -d",
+    "deploy": "npx prisma migrate deploy && bun --watch run src/server.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.11.16",
+    "@vitest/ui": "^1.2.2",
+    "prisma": "^5.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "5.9.1",
+    "date-fns": "^3.3.1",
+    "libphonenumber-js": "^1.10.55",
+    "zod": "^3.22.4"
+  }
+}
