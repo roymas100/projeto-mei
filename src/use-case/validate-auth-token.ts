@@ -16,7 +16,7 @@ export class ValidateAuthToken {
     async execute({
         user_id, token
     }: { user_id: string, token: number }): Promise<{ user: User }> {
-        const user = await this.userRepository.findUserById(user_id)
+        const user = await this.userRepository.findById(user_id)
 
         if (!user) {
             throw new UserDoesNotExists()

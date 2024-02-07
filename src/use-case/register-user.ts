@@ -31,7 +31,7 @@ export class RegisterUser implements IRegisterUser {
         const phoneNumber = parsePhoneNumber(phone)
         const parsedPhone = phoneNumber.formatInternational()
 
-        const userWithSamePhone = await this.userRepository.findUserByPhone(parsedPhone)
+        const userWithSamePhone = await this.userRepository.findByPhone(parsedPhone)
 
         if (userWithSamePhone) {
             throw new UserAlreadyExists()

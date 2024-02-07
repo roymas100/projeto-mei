@@ -10,7 +10,7 @@ export class GenerateAuthToken {
     }
 
     async execute(user_id: string) {
-        const userExists = await this.userRepository.findUserById(user_id)
+        const userExists = await this.userRepository.findById(user_id)
 
         if (!userExists) {
             throw new UserDoesNotExists()

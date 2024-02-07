@@ -28,7 +28,7 @@ describe('Generate authentication token', () => {
         expect(user.confirmation_token).toBeNull()
         expect(token_expiration).toEqual(expect.any(Date))
 
-        const { confirmation_token } = await userRepository.findUserById(user.id) as User
+        const { confirmation_token } = await userRepository.findById(user.id) as User
         expect(confirmation_token).toEqual(expect.any(Number))
     })
 

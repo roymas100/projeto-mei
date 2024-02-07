@@ -5,11 +5,11 @@ import type { UserRepository } from "../user.repository";
 export class InMemoryUserRepository implements UserRepository {
     items: User[] = []
 
-    async findUserById(id: string): Promise<User | null> {
+    async findById(id: string): Promise<User | null> {
         return this.items.find(item => item.id === id) ?? null
     }
 
-    async findUserByPhone(phone: string): Promise<User | null> {
+    async findByPhone(phone: string): Promise<User | null> {
         return this.items.find(item => item.phone === phone) ?? null
     }
 

@@ -3,9 +3,10 @@ import { InMemoryUserRepository } from '../repositories/in-memory/users.in-memor
 import { RegisterUser, type IRegisterUser } from './register-user'
 import { UserAlreadyExists } from './errors/UserAlreadyExists.error'
 import { PhoneNumberNotValid } from './errors/PhoneNumberNotValid.error'
+import type { UserRepository } from '../repositories/user.repository'
 
 describe('Register User Use case', () => {
-    let userRepository: InMemoryUserRepository
+    let userRepository: UserRepository
     let sut: IRegisterUser
 
     beforeEach(() => {
