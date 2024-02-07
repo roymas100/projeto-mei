@@ -2,6 +2,7 @@ import { $Enums, Prisma, type User_company } from "@prisma/client";
 import type { UserCompanyRepository } from "../user-company.repository";
 
 export class InMemoryUserCompanyRepository implements UserCompanyRepository {
+
     items: User_company[] = []
 
     async create(data: Prisma.User_companyUncheckedCreateInput): Promise<User_company> {
@@ -19,12 +20,7 @@ export class InMemoryUserCompanyRepository implements UserCompanyRepository {
         return user_company
     }
 
-    async findByCompanyId(company_id: string): Promise<User_company | null> {
-        return this.items.find(item => item.company_id === company_id) ?? null
+    async findByIds({ company_id, user_id }: { user_id: string; company_id: string; }): Promise<User_company | null> {
+        return this.items.find(item => item.user_id === user_id && item.company_id === company_id) ?? null
     }
-
-    async findByUserId(user_id: string): Promise<User_company | null> {
-        return this.items.find(item => item.user_id === user_id) ?? null
-    }
-
 }

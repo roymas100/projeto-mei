@@ -18,7 +18,7 @@ export class GenerateAuthToken {
 
         const token = +Math.random().toFixed(6) * 1000000 // 6 numbers
 
-        const { confirmation_token, password_hash, ...user } = await this.userRepository.updateUser(user_id, {
+        const { confirmation_token, password_hash, ...user } = await this.userRepository.update(user_id, {
             updated_at: new Date(),
             confirmation_token: token,
             token_expiration: addMinutes(new Date(), 7) // VALID FOR 7 MINUTES

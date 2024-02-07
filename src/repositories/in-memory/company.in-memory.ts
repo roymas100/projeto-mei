@@ -3,6 +3,7 @@ import type { CompanyRepository } from "../company.repository";
 import { randomUUID } from "crypto";
 
 export class InMemoryCompanyRepository implements CompanyRepository {
+
     items: Company[] = []
 
     async create(data: Prisma.CompanyCreateInput): Promise<Company> {
@@ -24,6 +25,22 @@ export class InMemoryCompanyRepository implements CompanyRepository {
         return this.items.find(item => item.id === company_id) ?? null
     }
     async findByName(name: string): Promise<Company | null> {
-        return this.items.find(item => item.name.includes(name)) ?? null
+        return this.items.find(item => item.name === name) ?? null
+    }
+
+    async update(id: string, data: Company): Promise<Company> {
+        const companyIndex = this.items.findIndex(item => item.id === id)
+        const company = this.items[companyIndex]
+
+        const { created_at, id: ommited, ...newCompanyData } = data
+
+        const newcompany: Company = {
+            ...company,
+            ...newCompanyData,
+        }
+
+        this.items[companyIndex] = newcompany
+
+        return newcompany
     }
 }

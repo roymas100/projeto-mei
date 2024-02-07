@@ -25,7 +25,7 @@ describe('Validate authentication token', () => {
 
         expect(user.has_confirmed_phone).toBeFalsy()
 
-        await userRepository.updateUser(user.id, {
+        await userRepository.update(user.id, {
             token_expiration: addMinutes(new Date(), 7),
             confirmation_token: 123456
         })
@@ -63,7 +63,7 @@ describe('Validate authentication token', () => {
             phone: '+12133734253'
         })
 
-        await userRepository.updateUser(user.id, {
+        await userRepository.update(user.id, {
             token_expiration: subMilliseconds(new Date(), 1),
             confirmation_token: 123456
         })
@@ -80,7 +80,7 @@ describe('Validate authentication token', () => {
             phone: '+12133734253'
         })
 
-        await userRepository.updateUser(user.id, {
+        await userRepository.update(user.id, {
             token_expiration: addMinutes(new Date(), 7),
             confirmation_token: 123456
         })

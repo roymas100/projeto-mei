@@ -34,7 +34,7 @@ export class ValidateAuthToken {
             throw new TokenDoesNotMatch()
         }
 
-        const confirmedUser = await this.userRepository.updateUser(user_id, {
+        const confirmedUser = await this.userRepository.update(user_id, {
             has_confirmed_phone: true
         })
 

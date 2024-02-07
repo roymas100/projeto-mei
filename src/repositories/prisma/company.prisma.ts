@@ -22,4 +22,12 @@ export class PrismaCompanyRepository implements CompanyRepository {
             }
         })
     }
+    async update(id: string, data: Prisma.CompanyUpdateInput): Promise<Company> {
+        return await prisma.company.update({
+            data,
+            where: {
+                id
+            }
+        })
+    }
 }
