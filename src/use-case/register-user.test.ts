@@ -1,13 +1,13 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { InMemoryUserRepository } from '../repositories/in-memory/users.in-memory'
-import { RegisterUser, type IRegisterUser } from './register-user'
+import { RegisterUser } from './register-user'
 import { UserAlreadyExists } from './errors/UserAlreadyExists.error'
 import { PhoneNumberNotValid } from './errors/PhoneNumberNotValid.error'
 import type { UserRepository } from '../repositories/user.repository'
 
 describe('Register User Use case', () => {
     let userRepository: UserRepository
-    let sut: IRegisterUser
+    let sut: RegisterUser
 
     beforeEach(() => {
         userRepository = new InMemoryUserRepository()
@@ -18,6 +18,7 @@ describe('Register User Use case', () => {
         const { user } = await sut.execute({
             name: 'John Doe',
             phone: '+12133734253',
+            password: '123456'
         })
 
         expect(user.id).toEqual(expect.any(String))
@@ -27,7 +28,8 @@ describe('Register User Use case', () => {
         await expect(
             sut.execute({
                 name: 'John Doe',
-                phone: '2141241321412'
+                phone: '2141241321412',
+                password: '123456'
             })
         ).rejects.toBeInstanceOf(PhoneNumberNotValid)
     })
@@ -36,11 +38,14 @@ describe('Register User Use case', () => {
         await sut.execute({
             name: 'John Doe',
             phone: '+12133734253',
+            password: '123456'
+
         })
 
         await expect(sut.execute({
             name: 'Beautifull Joe',
-            phone: '+12133734253'
+            phone: '+12133734253',
+            password: '123456'
         })).rejects.toBeInstanceOf(UserAlreadyExists)
     })
 })

@@ -3,12 +3,9 @@ import type { UserRepository } from "../repositories/user.repository"
 import { PhoneNumberNotValid } from "./errors/PhoneNumberNotValid.error"
 import { UserAlreadyExists } from "./errors/UserAlreadyExists.error"
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js'
+import bcryptjs from "bcryptjs";
 
-export interface IRegisterUser {
-    execute(payload: { name: string, email?: string | null, phone: string }): Promise<{ user: User }>
-}
-
-export class RegisterUser implements IRegisterUser {
+export class RegisterUser {
     private userRepository
 
     constructor(userRepository: UserRepository) {
@@ -18,10 +15,12 @@ export class RegisterUser implements IRegisterUser {
     async execute({
         name,
         phone,
-        email
+        email,
+        password
     }: {
         name: string
         phone: string
+        password: string
         email?: string | null
     }) {
         if (!isValidPhoneNumber(phone)) {
@@ -37,9 +36,12 @@ export class RegisterUser implements IRegisterUser {
             throw new UserAlreadyExists()
         }
 
+        const password_hash = await bcryptjs.hash(password, 6)
+
         const user = await this.userRepository.create({
             name,
             email,
+            password_hash,
             phone: parsedPhone,
         })
 
