@@ -16,7 +16,7 @@ export class GenerateAuthToken {
             throw new UserDoesNotExists()
         }
 
-        const token = +Math.random().toFixed(4) * 1000
+        const token = +Math.random().toFixed(6) * 1000000 // 6 numbers
 
         const { confirmation_token, password_hash, ...user } = await this.userRepository.updateUser(user_id, {
             updated_at: new Date(),

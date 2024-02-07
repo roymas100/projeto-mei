@@ -15,9 +15,9 @@ describe('Generate authentication token', () => {
     })
 
     it('should generate token to known user', async () => {
-        const user = await userRepository.registerUser({
+        const user = await userRepository.create({
             name: 'John Doe',
-            phone: '+55999666333',
+            phone: '+12133734253',
         })
 
         const { user: {
@@ -37,9 +37,9 @@ describe('Generate authentication token', () => {
     })
 
     it('should not return token inside response', async () => {
-        const { id } = await userRepository.registerUser({
+        const { id } = await userRepository.create({
             name: 'John Doe',
-            phone: '+55999666333',
+            phone: '+12133734253',
         })
 
         const { user } = await sut.execute(id) as { user: User }

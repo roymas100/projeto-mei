@@ -37,7 +37,7 @@ export class RegisterUser implements IRegisterUser {
             throw new UserAlreadyExists()
         }
 
-        const user = await this.userRepository.registerUser({
+        const user = await this.userRepository.create({
             name,
             email,
             phone: parsedPhone,

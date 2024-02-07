@@ -13,7 +13,7 @@ export class InMemoryUserRepository implements UserRepository {
         return this.items.find(item => item.phone === phone) ?? null
     }
 
-    async registerUser(data: Prisma.UserCreateInput): Promise<User> {
+    async create(data: Prisma.UserCreateInput): Promise<User> {
         const user: User = {
             id: randomUUID(),
             name: data.name,

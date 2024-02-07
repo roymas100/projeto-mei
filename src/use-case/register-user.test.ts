@@ -16,7 +16,7 @@ describe('Register User Use case', () => {
     it('should register a new user', async () => {
         const { user } = await sut.execute({
             name: 'John Doe',
-            phone: '+5571999666333',
+            phone: '+12133734253',
         })
 
         expect(user.id).toEqual(expect.any(String))
@@ -34,12 +34,12 @@ describe('Register User Use case', () => {
     it('should not register a user with same phone number', async () => {
         await sut.execute({
             name: 'John Doe',
-            phone: '+5571999666333',
+            phone: '+12133734253',
         })
 
         await expect(sut.execute({
             name: 'Beautifull Joe',
-            phone: '+5571999666333'
+            phone: '+12133734253'
         })).rejects.toBeInstanceOf(UserAlreadyExists)
     })
 })
