@@ -23,7 +23,7 @@ interface RegisterCompanyParams {
 
 export async function registerCompany({ body: { name }, user_id }: RegisterCompanyParams) {
     if (!user_id) {
-        throw new Error('Bad request')
+        throw new Error('Bad request 2')
     }
 
     const registerUser = makeRegisterCompany()

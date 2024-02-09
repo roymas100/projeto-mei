@@ -1,4 +1,4 @@
-import { t } from "elysia"
+import { Elysia, t } from "elysia"
 import { generateToken, generateTokenParamsSchema } from "./controllers/generate-token"
 import { patchServiceBodySchema, patchServiceRules } from "./controllers/patch-service-rules"
 import { registerCompany, registerCompanyBodySchema } from "./controllers/register-company"
@@ -6,9 +6,12 @@ import { registerUser, registerUserBodySchema } from "./controllers/register-use
 import { validateToken, validateTokenBodySchema, validateTokenParamsSchema } from "./controllers/validate-token"
 import { CompanySchema, UserSchema } from "./schemas/elysia-schemas"
 import { signIn, signInBodySchema } from "./controllers/sign-in"
-import { app } from "../app"
+import { plugins } from "../plugins"
+import { middlewares } from "./middlewares/middlewares"
 
-const authenticationRoutesApp = app
+const globalPlugins = new Elysia().use(plugins.pre_render_plugins)
+
+const authenticationRoutes = new Elysia().use(globalPlugins)
     .post('/sign-up', ({ request, body }) => registerUser({ request, body }), {
         body: registerUserBodySchema,
         detail: {
@@ -79,71 +82,43 @@ const authenticationRoutesApp = app
         })
     })
 
-const dashboardRoutesApp = authenticationRoutesApp
-    .derive(async ({ set, jwt, bearer }) => {
-        const payload = await jwt.verify(bearer)
-
-        return {
-            user_id: payload ? payload.user_id : null,
-            isAuthenticated: !!payload
-        }
-    })
-
-export const server = dashboardRoutesApp
-    .post('/company', ({ request, body, store, user_id }) => registerCompany({
-        body,
-        request,
-        store,
-        user_id
-    }), {
-        beforeHandle: async ({ set, isAuthenticated }) => {
-            if (!isAuthenticated) {
-                set.status = 401
-                set.headers[
-                    'WWW-Authenticate'
-                ] = `Bearer realm='sign', error="invalid_request"`
-
-                return new Response('Unauthorized', {
-                    status: 401
-                })
+const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
+    app.use(middlewares.verifyTokenPlugin)
+        .post('/company', ({ request, body, store, user_id }) => registerCompany({
+            body,
+            request,
+            store,
+            user_id
+        }), {
+            detail: {
+                tags: ['Dashboard']
+            },
+            body: registerCompanyBodySchema,
+            response: {
+                200: t.Object({
+                    company: CompanySchema
+                }),
+                401: t.String()
             }
-        },
-        detail: {
-            tags: ['Dashboard']
-        },
-        body: registerCompanyBodySchema,
-        response: {
-            200: t.Object({
-                company: CompanySchema
-            }),
-            401: t.String()
-        }
-    })
-    .patch('/company/:company_id', ({ request, body, params }) => patchServiceRules({
-        body,
-        request,
-        params,
-    }), {
-        beforeHandle: async ({ isAuthenticated, set }) => {
-            if (!isAuthenticated) {
-                set.status = 401
-                set.headers[
-                    'WWW-Authenticate'
-                ] = `Bearer realm='sign', error="invalid_request"`
-
-                return new Response('Unauthorized', {
-                    status: 401
-                })
+        })
+        .patch('/company/:company_id', ({ request, body, params }) => patchServiceRules({
+            body,
+            request,
+            params,
+        }), {
+            detail: {
+                tags: ['Dashboard']
+            },
+            body: patchServiceBodySchema,
+            response: {
+                200: t.Object({
+                    company: CompanySchema
+                }),
+                401: t.String()
             }
-        },
-        detail: {
-            tags: ['Dashboard']
-        },
-        body: patchServiceBodySchema,
-        response: {
-            200: t.Object({
-                company: CompanySchema
-            }),
-            401: t.String()
-        }
-    })
+        })
+)
+
+export const routes = new Elysia()
+    .use(authenticationRoutes)
+    .use(dashboardRoutes)
