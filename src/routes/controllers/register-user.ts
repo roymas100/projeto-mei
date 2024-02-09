@@ -1,17 +1,39 @@
-import { z } from "zod"
+import type { User } from "@prisma/client"
 import { makeRegisterUser } from "../../use-case/factories/makeRegisterUser"
+import { t } from "elysia"
 
-export async function registerUser(req: Request): Promise<Response> {
+export const registerUserBodySchema = t.Object({
+    name: t.String({
+        examples: ['John Doe'],
+        error: 'Must be a string'
+    }),
+    phone: t.String({
+        examples: ['+5571999666333'],
+        error: 'Must be a string'
+    }),
+    password: t.String({
+        examples: ['123456'],
+        error: 'Must have more than 6 of length size',
+        minLength: 6
+    }),
+    email: t.Optional(t.String({
+        format: 'email',
+        examples: ['email@provedor.com'],
+        error: 'Invalid email'
+    }))
+})
 
-    const schema = z.object({
-        name: z.string(),
-        phone: z.string(),
-        password: z.string(),
-        email: z.string().optional()
-    })
+interface RegisterUserParams {
+    request: Request,
+    body: {
+        name: string,
+        phone: string,
+        password: string,
+        email?: string,
+    }
+}
 
-    const { email, name, phone, password } = schema.parse(await req.json())
-
+export async function registerUser({ request, body: { name, password, phone, email } }: RegisterUserParams) {
     const registerUser = makeRegisterUser()
 
     const { user } = await registerUser.execute({
@@ -21,5 +43,5 @@ export async function registerUser(req: Request): Promise<Response> {
         email
     })
 
-    return new Response(JSON.stringify({ user }))
+    return { user }
 }

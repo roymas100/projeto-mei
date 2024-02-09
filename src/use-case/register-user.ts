@@ -38,7 +38,7 @@ export class RegisterUser {
 
         const password_hash = await bcryptjs.hash(password, 6)
 
-        const user = await this.userRepository.create({
+        const { password_hash: ommit, ...user } = await this.userRepository.create({
             name,
             email,
             password_hash,

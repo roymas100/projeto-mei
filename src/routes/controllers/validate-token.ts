@@ -1,14 +1,31 @@
-import { z } from "zod"
 import { makeValidateAuthToken } from "../../use-case/factories/makeValidateAuthToken"
+import { t } from "elysia"
 
-export async function validateToken(req: Request): Promise<Response> {
-    const schema = z.object({
-        user_id: z.string(),
-        token: z.number(),
-    })
+export const validateTokenBodySchema = t.Object({
+    token: t.Number({
+        examples: ['123456'],
+        error: 'Bad request'
+    }),
+})
 
-    const { user_id, token } = schema.parse(await req.json())
+export const validateTokenParamsSchema = t.Object({
+    user_id: t.String({
+        examples: ['xxxxx-xxxxx-xxxxx-xxxxx'],
+        error: 'Bad request'
+    }),
+})
 
+interface ValidateTokenParams {
+    request: Request,
+    body: {
+        token: number,
+    }
+    params: {
+        user_id: string,
+    }
+}
+
+export async function validateToken({ request, body: { token }, params: { user_id } }: ValidateTokenParams) {
     const registerUser = makeValidateAuthToken()
 
     const { user } = await registerUser.execute({
@@ -16,5 +33,8 @@ export async function validateToken(req: Request): Promise<Response> {
         user_id
     })
 
-    return new Response(JSON.stringify({ user }))
+    return {
+        user,
+        token: null
+    }
 }

@@ -1,21 +1,39 @@
-import { z } from "zod"
 import { makeRegisterCompany } from "../../use-case/factories/makeRegisterCompany"
+import { t } from "elysia"
 
-export async function registerCompany(req: Request): Promise<Response> {
+export const registerCompanyBodySchema = t.Object({
+    // user_id: t.String({
+    //     examples: ['xxxxx-xxxxx-xxxxx-xxxxx'],
+    //     error: 'User id missing'
+    // }),
+    name: t.String({
+        examples: ['Company name'],
+        error: 'Company name missing'
+    }),
+})
 
-    const schema = z.object({
-        name: z.string(),
-        user_id: z.string(),
-    })
+interface RegisterCompanyParams {
+    store: Object,
+    request: Request,
+    body: {
+        name: string,
+    },
+    user_id: string | number | null,
+}
 
-    const { user_id, name } = schema.parse(await req.json())
+export async function registerCompany({ body: { name }, user_id }: RegisterCompanyParams) {
+    if (!user_id) {
+        throw new Error('Bad request')
+    }
 
     const registerUser = makeRegisterCompany()
 
     const { company, user_company } = await registerUser.execute({
         name,
-        user_id
+        user_id: user_id as string
     })
 
-    return new Response(JSON.stringify({ company }))
+    return {
+        company
+    }
 }

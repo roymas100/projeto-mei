@@ -1,8 +1,5 @@
-import routes from "./routes/routes";
+import { server } from "./routes/routes";
 
-const server = Bun.serve({
-    port: Bun.env.PORT,
-    fetch: routes,
-});
+server.listen(Bun.env.PORT)
 
-console.log(`Listening on http://localhost:${server.port} ...`);
+console.log(`Listening on http://localhost:${Bun.env.PORT} ...`);

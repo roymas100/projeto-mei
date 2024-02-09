@@ -1,16 +1,29 @@
-import { z } from "zod"
 import { makePatchServiceRules } from "../../use-case/factories/makePatchServiceRules"
+import { t } from "elysia"
 
-export async function patchServiceRules(req: Request): Promise<Response> {
+export const patchServiceBodySchema = t.Object({
+    service_rules: t.Nullable(t.String({
+        examples: ['Payment before session!'],
+        error: 'Bad request'
+    })),
+    cancellation_grace_time: t.Optional(t.String({
+        examples: ['00:00:00'],
+        error: 'Bad request'
+    })),
+})
 
-    const schema = z.object({
-        company_id: z.string(),
-        service_rules: z.string().nullable(),
-        cancellation_grace_time: z.string().optional(),
-    })
+interface PatchServiceParams {
+    request: Request,
+    params: {
+        company_id: string,
+    }
+    body: {
+        service_rules?: string | null,
+        cancellation_grace_time?: string,
+    }
+}
 
-    const { cancellation_grace_time, company_id, service_rules } = schema.parse(await req.json())
-
+export async function patchServiceRules({ body: { cancellation_grace_time, service_rules }, params: { company_id } }: PatchServiceParams) {
     const registerUser = makePatchServiceRules()
 
     const { company } = await registerUser.execute({
@@ -19,5 +32,7 @@ export async function patchServiceRules(req: Request): Promise<Response> {
         service_rules
     })
 
-    return new Response(JSON.stringify({ company }))
+    return {
+        company
+    }
 }
