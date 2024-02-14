@@ -84,39 +84,40 @@ const authenticationRoutes = new Elysia().use(globalPlugins)
 
 const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
     app.use(middlewares.verifyTokenPlugin)
-        .post('/company', ({ request, body, store, user_id }) => registerCompany({
-            body,
-            request,
-            store,
-            user_id
-        }), {
-            detail: {
-                tags: ['Dashboard']
-            },
-            body: registerCompanyBodySchema,
-            response: {
-                200: t.Object({
-                    company: CompanySchema
-                }),
-                401: t.String()
-            }
-        })
-        .patch('/company/:company_id', ({ request, body, params }) => patchServiceRules({
-            body,
-            request,
-            params,
-        }), {
-            detail: {
-                tags: ['Dashboard']
-            },
-            body: patchServiceBodySchema,
-            response: {
-                200: t.Object({
-                    company: CompanySchema
-                }),
-                401: t.String()
-            }
-        })
+        .group('/company', (app) => app
+            .post('', ({ request, body, store, user_id }) => registerCompany({
+                body,
+                request,
+                store,
+                user_id
+            }), {
+                detail: {
+                    tags: ['Dashboard']
+                },
+                body: registerCompanyBodySchema,
+                response: {
+                    200: t.Object({
+                        company: CompanySchema
+                    }),
+                    401: t.String()
+                }
+            })
+            .patch('/:company_id', ({ request, body, params }) => patchServiceRules({
+                body,
+                request,
+                params,
+            }), {
+                detail: {
+                    tags: ['Dashboard']
+                },
+                body: patchServiceBodySchema,
+                response: {
+                    200: t.Object({
+                        company: CompanySchema
+                    }),
+                    401: t.String()
+                }
+            }))
 )
 
 export const routes = new Elysia()

@@ -66,7 +66,4 @@ describe('Patch service rules', async () => {
         })).rejects.toBeInstanceOf(CancellationGraceTimeFormat)
     })
 
-    it('should not patch if user admin is not logged in', async () => {
-        expect(1).toBe(2)
-    })
 })

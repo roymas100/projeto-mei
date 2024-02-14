@@ -43,12 +43,12 @@ enum COMPANY_ROLE {
 }
 
 model User_company {
-  role           COMPANY_ROLE     @default(EMPLOYEE)
-  created_at     DateTime         @default(now())
-  updated_at     DateTime         @updatedAt
-  deleted_at     DateTime?
-  appointments   Appointments[]
-  schedule_rules Schedule_rules[]
+  role         COMPANY_ROLE   @default(EMPLOYEE)
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  deleted_at   DateTime?
+  appointments Appointments[]
+  schedules    Schedule[]
 
   user       User    @relation(fields: [user_id], references: [id])
   user_id    String
@@ -74,16 +74,16 @@ model Appointments {
 }
 
 enum Recurrency_type {
-  DAY_OF_THE_WEEK
   DATE
   INTERVAL_OF_DATES
 }
 
-model Schedule_rules {
+model Schedule {
   id                       String          @id @default(uuid())
+  name                     String
   recurrency_type          Recurrency_type
   dates                    String
-  recurrency_intervals     String
+  intervals                String
   start_of_shift           String // 00:00:00
   end_of_shift             String // 00:00:00
   duration_per_appointment String // 00:00:00
