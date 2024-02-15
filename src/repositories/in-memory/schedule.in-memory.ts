@@ -1,8 +1,8 @@
-import type { $Enums, Prisma, Schedule } from "@prisma/client";
+import type { Prisma, Schedule } from "@prisma/client";
 import type { PatchMany, ScheduleRepository } from "../schedule.repository";
 import { randomUUID } from "crypto";
-import { customOrderBy } from '../utils/orderBy'
-import { customWhere } from "../utils/where";
+import type { DefaultArgs } from "@prisma/client/runtime/library";
+import { ArrayTools } from "../utils/ArrayTools";
 
 export class InMemoryScheduleRepository implements ScheduleRepository {
     items: Schedule[] = []
@@ -29,28 +29,53 @@ export class InMemoryScheduleRepository implements ScheduleRepository {
 
         return schedule
     }
-    async update(id: string, data: Partial<Schedule>): Promise<Schedule> {
-        const scheduleRulesIndex = this.items.findIndex(item => item.id === id)
-        const scheduleRules = this.items[scheduleRulesIndex]
 
-        scheduleRules.recurrency_type
+    async patch(id: string, scheduleData: Partial<Schedule>): Promise<Schedule> {
+        const scheduleIndex = this.items.findIndex(item => item.id === id)
 
-        const { created_at, id: ommited, ...newScheduleData } = data
-        newScheduleData.recurrency_type
-
-        newScheduleData.recurrency_type
-        const newSchedule: Schedule = {
-            ...scheduleRules,
-            ...newScheduleData,
+        const schedule: Schedule = {
+            ...this.items[scheduleIndex],
+            ...scheduleData,
+            id,
+            created_at: this.items[scheduleIndex].created_at,
         }
 
-        this.items[scheduleRulesIndex] = newSchedule
+        this.items[scheduleIndex] = schedule
 
-        return newSchedule
+        return schedule
     }
 
-    patchMany(schedules: PatchMany[]): Promise<Schedule[]> {
-        throw new Error("Method not implemented.");
+    async patchMany(schedules: PatchMany[]): Promise<Schedule[]> {
+        const newSchedules = []
+
+        for (const scheduleData of schedules) {
+            const id = scheduleData.id
+            const scheduleIndex = this.items.findIndex(item => item.id === id)
+
+            const schedule: Schedule = {
+                ...this.items[scheduleIndex],
+                ...scheduleData,
+                id,
+                created_at: this.items[scheduleIndex].created_at,
+            }
+
+            this.items[scheduleIndex] = schedule
+            newSchedules.push(schedule)
+        }
+
+        return newSchedules
+    }
+
+    async find(scheduleArgs: Prisma.ScheduleFindFirstArgs<DefaultArgs>): Promise<Schedule[]> {
+        const { orderBy, where, select } = scheduleArgs
+
+        const item = new ArrayTools<Schedule>(this.items)
+
+        return item.findMany({
+            orderBy,
+            select,
+            where
+        })
     }
 
     async findById(schedule_id: string): Promise<Schedule | null> {
@@ -58,8 +83,14 @@ export class InMemoryScheduleRepository implements ScheduleRepository {
     }
 
     async findFirst(scheduleArgs: Prisma.ScheduleFindFirstArgs): Promise<Schedule | null> {
-        const { orderBy: order, where } = scheduleArgs
+        const { orderBy, where, select } = scheduleArgs
 
-        return customWhere<Schedule, Prisma.ScheduleWhereInput>(customOrderBy<Schedule, Prisma.ScheduleOrderByWithRelationInput>(this.items, order), where) ?? null
+        const item = new ArrayTools<Schedule>(this.items)
+
+        return item.findFirst({
+            orderBy,
+            select,
+            where
+        })
     }
 }

@@ -6,8 +6,9 @@ export interface PatchMany extends Partial<Schedule> {
 
 export interface ScheduleRepository {
     create(data: Prisma.ScheduleUncheckedCreateInput): Promise<Schedule>
-    update(id: string, data: Partial<Schedule>): Promise<Schedule>
+    patch(id: string, schedule: Partial<Schedule>): Promise<Schedule>
     patchMany(schedules: PatchMany[]): Promise<Schedule[]>
     findById(schedule_id: string): Promise<Schedule | null>
     findFirst(scheduleArgs: Prisma.ScheduleFindFirstArgs): Promise<Schedule | null>
+    find(scheduleArgs: Prisma.ScheduleFindFirstArgs): Promise<Schedule[]>
 }

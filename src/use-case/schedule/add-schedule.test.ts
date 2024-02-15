@@ -1,21 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { CompanyRepository } from "../repositories/company.repository";
-import type { UserCompanyRepository } from "../repositories/user-company.repository";
-import type { UserRepository } from "../repositories/user.repository";
-import type { ScheduleRepository } from "../repositories/schedule.repository";
+import type { CompanyRepository } from "../../repositories/company.repository";
+import type { UserCompanyRepository } from "../../repositories/user-company.repository";
+import type { UserRepository } from "../../repositories/user.repository";
+import type { ScheduleRepository } from "../../repositories/schedule.repository";
 import { AddSchedule } from "./add-schedule";
-import { InMemoryCompanyRepository } from "../repositories/in-memory/company.in-memory";
-import { InMemoryUserCompanyRepository } from "../repositories/in-memory/user-company.in-memory";
-import { InMemoryUserRepository } from "../repositories/in-memory/users.in-memory";
-import { InMemoryScheduleRepository } from "../repositories/in-memory/schedule.in-memory";
+import { InMemoryCompanyRepository } from "../../repositories/in-memory/company.in-memory";
+import { InMemoryUserCompanyRepository } from "../../repositories/in-memory/user-company.in-memory";
+import { InMemoryUserRepository } from "../../repositories/in-memory/users.in-memory";
+import { InMemoryScheduleRepository } from "../../repositories/in-memory/schedule.in-memory";
 import { $Enums, type Company, type User, type User_company } from "@prisma/client";
 import { addDays, format } from "date-fns";
-import { StartAfterEnd } from "./errors/StartAfterEnd.error";
-import { ScheduleDurationError } from "./errors/ScheduleDurationError.error";
-import { ErrorFormattingField } from "./errors/ErrorFormattingField.error";
-import { DateFormatIncompatible } from "./errors/DateFormatIncompatible.error";
-import { PositionIsTaken } from "./errors/PositionIstaken.error";
-import { IntervalBeforeStart } from "./errors/IntervalBeforeStart.error";
+import { StartAfterEnd } from "../errors/StartAfterEnd.error";
+import { ScheduleDurationError } from "../errors/ScheduleDurationError.error";
+import { ErrorFormattingField } from "../errors/ErrorFormattingField.error";
+import { IntervalBeforeStart } from "../errors/IntervalBeforeStart.error";
+import { PositionIsTaken } from "../errors/PositionIsTaken.error";
 
 describe('Add Schedule', () => {
     let userRepository: UserRepository

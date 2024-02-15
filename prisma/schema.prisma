@@ -73,7 +73,7 @@ model Appointments {
   user_company_company_id String
 }
 
-enum Recurrency_type {
+enum RECURRENCY_TYPE {
   DATE
   INTERVAL_OF_DATES
 }
@@ -81,7 +81,7 @@ enum Recurrency_type {
 model Schedule {
   id                       String          @id @default(uuid())
   name                     String
-  recurrency_type          Recurrency_type
+  recurrency_type          RECURRENCY_TYPE
   dates                    String
   intervals                String
   start_of_shift           String // 00:00:00
