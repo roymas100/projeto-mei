@@ -64,6 +64,10 @@ export class RegisterCompany {
             role: "ADMIN"
         })
 
+        await this.userRepository.update(user.id, {
+            current_company_id: company.id
+        })
+
         return {
             company,
             user_company

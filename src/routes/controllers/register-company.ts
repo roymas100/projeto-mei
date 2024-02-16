@@ -18,12 +18,12 @@ interface RegisterCompanyParams {
     body: {
         name: string,
     },
-    user_id: string | number | null,
+    user_id: string | null,
 }
 
 export async function registerCompany({ body: { name }, user_id }: RegisterCompanyParams) {
     if (!user_id) {
-        throw new Error('Bad request 2')
+        throw new Error('Unauthorized.')
     }
 
     const registerUser = makeRegisterCompany()

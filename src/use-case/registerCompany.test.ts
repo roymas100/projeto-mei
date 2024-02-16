@@ -40,6 +40,22 @@ describe('Register company', () => {
         expect(company.id).toEqual(expect.any(String))
     })
 
+    it('Should register company correctly and set current_company_id', async () => {
+        const user = await userRepository.create({
+            name: 'John Doe',
+            phone: '+12133734253',
+        })
+
+        const { company, user_company } = await sut.execute({
+            name: 'Company name placehoulder',
+            user_id: user.id
+        })
+
+        const user1 = await userRepository.findById(user.id)
+
+        expect(user1?.current_company_id).toEqual(company.id)
+    })
+
     it('should create conection between tabels correctly', async () => {
         const user = await userRepository.create({
             name: 'John Doe',

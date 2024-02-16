@@ -99,9 +99,9 @@ export function checkDuration({
 
 export function checkRecurrencyType({
     dates, recurrency_type
-}: { dates: string, recurrency_type: $Enums.Recurrency_type }) {
-    function isDayOfTheWeek(type: $Enums.Recurrency_type, index: number) {
-        return type === $Enums.Recurrency_type.INTERVAL_OF_DATES && (index !== 0 && index !== 1)
+}: { dates: string, recurrency_type: $Enums.RECURRENCY_TYPE }) {
+    function isDayOfTheWeek(type: $Enums.RECURRENCY_TYPE, index: number) {
+        return type === $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES && (index !== 0 && index !== 1)
     }
 
     // 12/10/2024;10/08/2024 || 12/10/2024;10/08/2024;Sun;Tue;Wed; || 12/10/2024;10/08/2024;12/10/2024;10/08/2024

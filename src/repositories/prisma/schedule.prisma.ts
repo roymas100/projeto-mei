@@ -1,21 +1,33 @@
 import type { Prisma, $Enums, Schedule } from "@prisma/client";
-import type { PatchMany, ScheduleRepository } from "../schedule.repository";
+import type { ScheduleRepository, ScheduleTransactionUpdate } from "../schedule.repository";
 import { prisma } from "../../setups/prisma";
 import type { DefaultArgs } from "@prisma/client/runtime/library";
 
 export class PrismaScheduleRepository implements ScheduleRepository {
+    transactionUpdate(payload: ScheduleTransactionUpdate[]): Promise<Schedule[]> {
+        return prisma.$transaction(payload.map(item => prisma.schedule.update({
+            where: item.where,
+            data: item.data
+        })))
+    }
+
     find(scheduleArgs: Prisma.ScheduleFindFirstArgs<DefaultArgs>): Promise<Schedule[]> {
-        throw new Error("Method not implemented.");
+        return prisma.schedule.findMany(scheduleArgs)
     }
+
     create(data: Prisma.ScheduleUncheckedCreateInput): Promise<Schedule> {
-        throw new Error("Method not implemented.");
+        return prisma.schedule.create({ data })
     }
-    patch(id: string, schedule: PatchMany): Promise<Schedule> {
-        throw new Error("Method not implemented.");
+
+    patch(id: string, schedule: Partial<Schedule>): Promise<Schedule> {
+        return prisma.schedule.update({
+            where: {
+                id
+            },
+            data: schedule
+        })
     }
-    patchMany(schedules: PatchMany[]): Promise<Schedule[]> {
-        throw new Error("Method not implemented.");
-    }
+
     findById(schedule_id: string): Promise<Schedule | null> {
         return prisma.schedule.findUnique({
             where: {
@@ -27,6 +39,10 @@ export class PrismaScheduleRepository implements ScheduleRepository {
         return prisma.schedule.findFirst(scheduleArgs)
     }
     delete(id: string): Promise<Schedule> {
-        throw new Error("Method not implemented.");
+        return prisma.schedule.delete({
+            where: {
+                id
+            }
+        })
     }
 }

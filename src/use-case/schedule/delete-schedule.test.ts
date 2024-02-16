@@ -67,7 +67,7 @@ describe('Delete Schedule use case', () => {
 
         oldSchedule = await scheduleRepository.create({
             priority: 1,
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',

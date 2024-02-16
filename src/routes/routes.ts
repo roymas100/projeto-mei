@@ -8,6 +8,10 @@ import { CompanySchema, UserSchema } from "./schemas/elysia-schemas"
 import { signIn, signInBodySchema } from "./controllers/sign-in"
 import { plugins } from "../plugins"
 import { middlewares } from "./middlewares/middlewares"
+import { addSchedule, addScheduleBodySchema, addScheduleParamsSchema } from "./controllers/add-schedule"
+import { patchSchedule, patchScheduleBodySchema, patchScheduleParamsSchema } from "./controllers/patch-schedule"
+import { getSchedule, getScheduleParamsSchema } from "./controllers/get-schedule"
+import { deleteSchedule, deleteScheduleParamsSchema } from "./controllers/delete-schedule"
 
 const globalPlugins = new Elysia().use(plugins.pre_render_plugins)
 
@@ -117,7 +121,43 @@ const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
                     }),
                     401: t.String()
                 }
-            }))
+            })
+            .group('/:company_id/schedule', app => app
+                .post('', ({ body, user_id, params }) => addSchedule({
+                    body,
+                    params,
+                    user_id
+                }), {
+                    body: addScheduleBodySchema,
+                    params: addScheduleParamsSchema
+                })
+                .patch('/:schedule_id', ({ body, params }) => patchSchedule({
+                    body, params
+                }), {
+                    body: patchScheduleBodySchema,
+                    params: patchScheduleParamsSchema
+                })
+                .get('', ({
+                    user_id,
+                    params
+                }) => getSchedule({
+                    user_id,
+                    params
+                }), {
+                    params: getScheduleParamsSchema
+                })
+                .delete('/:schedule_id', ({
+                    params,
+                    user_id
+                }) => deleteSchedule({
+                    params,
+                    user_id
+                }), {
+                    params: deleteScheduleParamsSchema
+                })
+            )
+        )
+
 )
 
 export const routes = new Elysia()

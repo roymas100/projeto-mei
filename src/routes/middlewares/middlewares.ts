@@ -5,7 +5,7 @@ const verifyTokenPlugin = new Elysia().use(plugins.pre_render_plugins).derive(as
     const payload = await jwt.verify(bearer)
 
     return {
-        user_id: payload ? payload.user_id : null,
+        user_id: payload ? payload.user_id as string : null,
         isAuthenticated: !!payload
     }
 }).onBeforeHandle(async ({ set, isAuthenticated }) => {

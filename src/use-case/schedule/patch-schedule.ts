@@ -47,7 +47,14 @@ export class PatchSchedule {
             }
         })
 
-        await this.scheduleRepository.patchMany(rearrangedSchedule)
+        await this.scheduleRepository.transactionUpdate(schedules.map(schedule => ({
+            where: {
+                id: schedule.id
+            },
+            data: {
+                priority: schedule.priority + 1
+            }
+        })))
     }
 
     async execute(scheduleData: {
@@ -57,7 +64,7 @@ export class PatchSchedule {
         duration_per_appointment?: string
         user_company_user_id?: string
         user_company_company_id?: string
-        recurrency_type?: $Enums.Recurrency_type
+        recurrency_type?: $Enums.RECURRENCY_TYPE
         dates?: string
         priority?: number
         name?: string

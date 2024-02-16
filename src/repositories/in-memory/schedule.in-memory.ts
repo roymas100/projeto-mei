@@ -1,10 +1,11 @@
 import type { $Enums, Prisma, Schedule } from "@prisma/client";
-import type { PatchMany, ScheduleRepository } from "../schedule.repository";
+import type { ScheduleRepository, ScheduleTransactionUpdate } from "../schedule.repository";
 import { randomUUID } from "crypto";
 import type { DefaultArgs } from "@prisma/client/runtime/library";
 import { ArrayTools } from "../utils/ArrayTools";
 
 export class InMemoryScheduleRepository implements ScheduleRepository {
+
 
     items: Schedule[] = []
 
@@ -46,25 +47,33 @@ export class InMemoryScheduleRepository implements ScheduleRepository {
         return schedule
     }
 
-    async patchMany(schedules: PatchMany[]): Promise<Schedule[]> {
-        const newSchedules = []
+    async transactionUpdate(payload: ScheduleTransactionUpdate[]): Promise<Schedule[]> {
+        const schedules: Schedule[] = []
+        for (const transationData of payload) {
+            const scheduleIndex = this.items.findIndex(item => {
+                let pass = true
 
-        for (const scheduleData of schedules) {
-            const id = scheduleData.id
-            const scheduleIndex = this.items.findIndex(item => item.id === id)
+                const where = transationData.where as Partial<Schedule>
+                for (const key in where) {
+                    pass = pass && item[key as keyof Schedule] === where[key as keyof Schedule]
+                }
 
-            const schedule: Schedule = {
-                ...this.items[scheduleIndex],
-                ...scheduleData,
-                id,
-                created_at: this.items[scheduleIndex].created_at,
+                return pass
+            })
+
+            if (scheduleIndex >= 0) {
+                const schedule: Schedule = {
+                    ...this.items[scheduleIndex],
+                    ...transationData.data,
+                    id: this.items[scheduleIndex].id,
+                    created_at: this.items[scheduleIndex].created_at,
+                }
+
+                this.items[scheduleIndex] = schedule
+                schedules.push(schedule)
             }
-
-            this.items[scheduleIndex] = schedule
-            newSchedules.push(schedule)
         }
-
-        return newSchedules
+        return schedules
     }
 
     async find(scheduleArgs: Prisma.ScheduleFindFirstArgs<DefaultArgs>): Promise<Schedule[]> {

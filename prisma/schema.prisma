@@ -24,6 +24,9 @@ model User {
   token_expiration    DateTime?
   appointments        Appointments[]
   user_company        User_company[]
+
+  current_company    Company? @relation(fields: [current_company_id], references: [id])
+  current_company_id String?
 }
 
 model Company {
@@ -35,6 +38,7 @@ model Company {
   updated_at              DateTime       @updatedAt
   deleted_at              DateTime?
   user_company            User_company[]
+  User                    User[]
 }
 
 enum COMPANY_ROLE {

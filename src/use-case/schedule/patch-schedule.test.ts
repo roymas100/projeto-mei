@@ -71,7 +71,7 @@ describe('Patch use case', () => {
 
         oldSchedule = await scheduleRepository.create({
             priority: 1,
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -118,7 +118,7 @@ describe('Patch use case', () => {
 
         const secondSchedule = await scheduleRepository.create({
             priority: 2,
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -260,7 +260,7 @@ describe('Patch use case', () => {
         ].join(';')
 
         await scheduleRepository.patch(oldSchedule.id, {
-            recurrency_type: $Enums.Recurrency_type.DATE,
+            recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
         })
 
         const { schedule } = await sut.execute({
@@ -298,7 +298,7 @@ describe('Patch use case', () => {
         await expect(
             sut.execute({
                 id: oldSchedule.id,
-                recurrency_type: $Enums.Recurrency_type.DATE
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE
             })
         ).rejects.toBeInstanceOf(ScheduleTypeError)
     })
@@ -319,7 +319,7 @@ describe('Patch use case', () => {
         await expect(
             sut.execute({
                 id: oldSchedule.id,
-                recurrency_type: $Enums.Recurrency_type.DATE,
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
                 dates,
             })
         ).rejects.toBeInstanceOf(ErrorFormattingField)
@@ -327,7 +327,7 @@ describe('Patch use case', () => {
 
     it('should not patch a schedule to INTERVAL_OF_DATES type with more than one date', async () => {
         await scheduleRepository.patch(oldSchedule.id, {
-            recurrency_type: $Enums.Recurrency_type.DATE,
+            recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
             dates: [
                 format(new Date(), 'MM/dd/yyyy'),
                 format(addDays(new Date(), 2), 'MM/dd/yyyy'),
@@ -344,7 +344,7 @@ describe('Patch use case', () => {
         await expect(
             sut.execute({
                 id: oldSchedule.id,
-                recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+                recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
                 dates
             })
         ).rejects.toBeInstanceOf(ErrorFormattingField)

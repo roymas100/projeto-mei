@@ -72,7 +72,7 @@ describe('Add Schedule', () => {
         ]
 
         const { schedule } = await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -101,7 +101,7 @@ describe('Add Schedule', () => {
         ]
 
         await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -113,7 +113,7 @@ describe('Add Schedule', () => {
         })
 
         const { schedule } = await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -142,7 +142,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '17:00:00',
@@ -169,7 +169,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '05:00:00',
             start_of_shift: '14:00:00',
@@ -196,7 +196,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01s:00:00',
             start_of_shift: '08/00/00',
@@ -223,7 +223,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -250,7 +250,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01/00/00',
             start_of_shift: '08:00:00',
@@ -277,7 +277,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -304,7 +304,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -338,7 +338,7 @@ describe('Add Schedule', () => {
         ]
 
         const { schedule } = await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -374,7 +374,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -401,7 +401,7 @@ describe('Add Schedule', () => {
         ]
 
         await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -413,7 +413,7 @@ describe('Add Schedule', () => {
         })
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -441,7 +441,7 @@ describe('Add Schedule', () => {
         ]
 
         await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -454,7 +454,7 @@ describe('Add Schedule', () => {
         })
 
         const { schedule } = await sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '08:00:00',
@@ -484,7 +484,7 @@ describe('Add Schedule', () => {
         ]
 
         await expect(sut.execute({
-            recurrency_type: $Enums.Recurrency_type.INTERVAL_OF_DATES,
+            recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
             dates,
             duration_per_appointment: '01:00:00',
             start_of_shift: '13:00:00',
