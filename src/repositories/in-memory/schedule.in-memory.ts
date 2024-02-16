@@ -1,10 +1,11 @@
-import type { Prisma, Schedule } from "@prisma/client";
+import type { $Enums, Prisma, Schedule } from "@prisma/client";
 import type { PatchMany, ScheduleRepository } from "../schedule.repository";
 import { randomUUID } from "crypto";
 import type { DefaultArgs } from "@prisma/client/runtime/library";
 import { ArrayTools } from "../utils/ArrayTools";
 
 export class InMemoryScheduleRepository implements ScheduleRepository {
+
     items: Schedule[] = []
 
     async create(data: Prisma.ScheduleUncheckedCreateInput): Promise<Schedule> {
@@ -92,5 +93,13 @@ export class InMemoryScheduleRepository implements ScheduleRepository {
             select,
             where
         })
+    }
+
+    async delete(id: string): Promise<Schedule> {
+        const index = this.items.findIndex(item => item.id === id)
+
+        const [schedule] = this.items.slice(index, 1)
+
+        return schedule
     }
 }

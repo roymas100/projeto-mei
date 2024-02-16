@@ -11,4 +11,5 @@ export interface ScheduleRepository {
     findById(schedule_id: string): Promise<Schedule | null>
     findFirst(scheduleArgs: Prisma.ScheduleFindFirstArgs): Promise<Schedule | null>
     find(scheduleArgs: Prisma.ScheduleFindFirstArgs): Promise<Schedule[]>
+    delete(id: string): Promise<Schedule>
 }

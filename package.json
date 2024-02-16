@@ -5,7 +5,8 @@
   "scripts": {
     "start": "bun install && docker compose up -d && bun prisma migrate dev && bun --watch run src/server.ts",
     "test": "bun vitest run",
-    "test:ui": "bun vitest --ui",
+    "coverage": "bun vitest run coverage",
+    "test:ui": "bun vitest --ui --coverage.enabled=true",
     "setup": "docker rmi -f projeto-mei-server && docker compose up -d",
     "deploy": "npx prisma migrate deploy && bun --watch run src/server.ts"
   },
@@ -13,6 +14,8 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/bun": "latest",
     "@types/node": "^20.11.16",
+    "@vitest/coverage-istanbul": "^1.2.2",
+    "@vitest/coverage-v8": "^1.2.2",
     "@vitest/ui": "^1.2.2",
     "prisma": "^5.9.1",
     "ts-node": "^10.9.2",

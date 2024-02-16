@@ -105,7 +105,7 @@ describe('Register company', () => {
     })
 
     // 02/07/2024 - could not think a way to reproduce this error
-    // it('should not create company if user_company already exists')
+    // it('should not create two connections with company and user', async () => {})
 
     it('Should not register company if user does not exists', async () => {
         await expect(sut.execute({

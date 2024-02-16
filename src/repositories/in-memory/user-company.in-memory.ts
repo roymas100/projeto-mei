@@ -2,7 +2,6 @@ import { $Enums, Prisma, type User_company } from "@prisma/client";
 import type { UserCompanyRepository } from "../user-company.repository";
 
 export class InMemoryUserCompanyRepository implements UserCompanyRepository {
-
     items: User_company[] = []
 
     async create(data: Prisma.User_companyUncheckedCreateInput): Promise<User_company> {
