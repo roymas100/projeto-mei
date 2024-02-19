@@ -1,3 +1,4 @@
+import { Unauthorized } from "../../use-case/errors/Unauthorized.error"
 import { makeRegisterCompany } from "../../use-case/factories/makeRegisterCompany"
 import { t } from "elysia"
 
@@ -23,7 +24,7 @@ interface RegisterCompanyParams {
 
 export async function registerCompany({ body: { name }, user_id }: RegisterCompanyParams) {
     if (!user_id) {
-        throw new Error('Unauthorized.')
+        throw new Unauthorized()
     }
 
     const registerUser = makeRegisterCompany()

@@ -1,4 +1,11 @@
+import { endOfDay, format, startOfDay } from "date-fns";
 import { t } from "elysia";
+
+export const AuthenticationSchema = t.Object({
+    'WWW-Authenticate': t.String({
+        examples: ['Bearer xxx'],
+    })
+})
 
 export const UserSchema = t.Object({
     id: t.String(t.Any()),
@@ -19,3 +26,15 @@ export const CompanySchema = t.Object({
     service_rules: t.Nullable(t.String(t.Any())),
     cancellation_grace_time: t.String(t.Any()),
 })
+
+export const TimesSchema =
+    t.Array(
+        t.Object({
+            start: t.Date(t.Any({
+                examples: [startOfDay(new Date())],
+            })),
+            end: t.Date(t.Any({
+                examples: [endOfDay(new Date())],
+            })),
+        })
+    )

@@ -1,5 +1,6 @@
 import { t } from "elysia";
 import { makeDeleteSchedule } from "../../use-case/factories/makeDeleteSchedule";
+import { Unauthorized } from "../../use-case/errors/Unauthorized.error";
 
 export const deleteScheduleParamsSchema = t.Object({
     schedule_id: t.String()
@@ -17,7 +18,7 @@ export async function deleteSchedule({
     params: { schedule_id }
 }: DeleteScheduleParams) {
     if (!user_id) {
-        throw new Error('Unauthorized.')
+        throw new Unauthorized()
     }
 
     const deleteSchedule = makeDeleteSchedule()

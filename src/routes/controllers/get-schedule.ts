@@ -1,5 +1,6 @@
 import { t } from "elysia";
 import { makeGetSchedule } from "../../use-case/factories/makeGetSchedule";
+import { Unauthorized } from "../../use-case/errors/Unauthorized.error";
 
 export const getScheduleParamsSchema = t.Object({
     company_id: t.String()
@@ -17,7 +18,7 @@ export async function getSchedule({
     params: { company_id }
 }: GetScheduleParams) {
     if (!user_id) {
-        throw new Error('Unauthorized.')
+        throw new Unauthorized()
     }
 
     const patchSchedule = makeGetSchedule()

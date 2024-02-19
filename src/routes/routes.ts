@@ -4,7 +4,7 @@ import { patchServiceBodySchema, patchServiceRules } from "./controllers/patch-s
 import { registerCompany, registerCompanyBodySchema } from "./controllers/register-company"
 import { registerUser, registerUserBodySchema } from "./controllers/register-user"
 import { validateToken, validateTokenBodySchema, validateTokenParamsSchema } from "./controllers/validate-token"
-import { CompanySchema, UserSchema } from "./schemas/elysia-schemas"
+import { AuthenticationSchema, CompanySchema, TimesSchema, UserSchema } from "./schemas/elysia-schemas"
 import { signIn, signInBodySchema } from "./controllers/sign-in"
 import { plugins } from "../plugins"
 import { middlewares } from "./middlewares/middlewares"
@@ -12,6 +12,7 @@ import { addSchedule, addScheduleBodySchema, addScheduleParamsSchema } from "./c
 import { patchSchedule, patchScheduleBodySchema, patchScheduleParamsSchema } from "./controllers/patch-schedule"
 import { getSchedule, getScheduleParamsSchema } from "./controllers/get-schedule"
 import { deleteSchedule, deleteScheduleParamsSchema } from "./controllers/delete-schedule"
+import { getAvailableTimes, getAvailableTimesParamsSchema, getAvailableTimesQuerySchema } from "./controllers/get-available-times"
 
 const globalPlugins = new Elysia().use(plugins.pre_render_plugins)
 
@@ -128,12 +129,18 @@ const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
                     params,
                     user_id
                 }), {
+                    detail: {
+                        tags: ['Dashboard']
+                    },
                     body: addScheduleBodySchema,
-                    params: addScheduleParamsSchema
+                    params: addScheduleParamsSchema,
                 })
                 .patch('/:schedule_id', ({ body, params }) => patchSchedule({
                     body, params
                 }), {
+                    detail: {
+                        tags: ['Dashboard']
+                    },
                     body: patchScheduleBodySchema,
                     params: patchScheduleParamsSchema
                 })
@@ -144,6 +151,9 @@ const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
                     user_id,
                     params
                 }), {
+                    detail: {
+                        tags: ['Dashboard']
+                    },
                     params: getScheduleParamsSchema
                 })
                 .delete('/:schedule_id', ({
@@ -153,9 +163,27 @@ const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
                     params,
                     user_id
                 }), {
+                    detail: {
+                        tags: ['Dashboard']
+                    },
                     params: deleteScheduleParamsSchema
-                })
+                }),
             )
+            .get('/:company_id/get-available-times', ({ query, params, user_id }) => getAvailableTimes({
+                params,
+                query,
+                user_id
+            }), {
+                detail: {
+                    tags: ['Dashboard']
+                },
+                headers: AuthenticationSchema,
+                query: getAvailableTimesQuerySchema,
+                params: getAvailableTimesParamsSchema,
+                response: t.Object({
+                    times: TimesSchema
+                })
+            })
         )
 
 )

@@ -1,6 +1,7 @@
 import { t } from "elysia";
 import { makeAddSchedule } from "../../use-case/factories/makeAddSchedule";
 import { $Enums } from "@prisma/client";
+import { Unauthorized } from "../../use-case/errors/Unauthorized.error";
 
 const intervals = [
     {
@@ -85,7 +86,7 @@ export async function addSchedule({
     }
 }: AddScheduleParams) {
     if (!user_id) {
-        throw new Error('Unauthorized.')
+        throw new Unauthorized()
     }
 
 
