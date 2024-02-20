@@ -1,25 +1,28 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { InMemoryScheduleRepository } from "../repositories/in-memory/schedule.in-memory";
 import type { ScheduleRepository } from "../repositories/schedule.repository";
+import type { AppointmentRepository } from "../repositories/appointment.repository";
 import type { UserRepository } from "../repositories/user.repository";
 import type { UserCompanyRepository } from "../repositories/user-company.repository";
 import type { CompanyRepository } from "../repositories/company.repository";
 import { InMemoryUserRepository } from "../repositories/in-memory/users.in-memory";
 import { InMemoryCompanyRepository } from "../repositories/in-memory/company.in-memory";
 import { InMemoryUserCompanyRepository } from "../repositories/in-memory/user-company.in-memory";
-import { $Enums, type Company, type Schedule, type User, type User_company } from "@prisma/client";
+import { $Enums, type Company, type User, type User_company } from "@prisma/client";
 import { GetAvailableTimes } from "./get-available-times";
-import { addDays, format, parse } from "date-fns";
+import { addDays, format, parse, set } from "date-fns";
 import { UserCompanyDoesNotExists } from "./errors/UserCompanyDoesNotExists.error";
 import { ErrorFormattingField } from "./errors/ErrorFormattingField.error";
 import { NoSchedulesConfigured } from "./errors/NoSchedulesConfigured.error";
-import { AvailableTimeEmpty } from "./errors/AvailableTimeEmpty.error";
+import { InMemoryAppointmentRepository } from "../repositories/in-memory/appointment.in-memory";
+import Sinon from "sinon";
 
 describe('Get available times', () => {
     let userRepository: UserRepository
     let companyRepository: CompanyRepository
     let userCompanyRepository: UserCompanyRepository
     let scheduleRepository: ScheduleRepository
+    let appointmentRepository: AppointmentRepository
     let sut: GetAvailableTimes
 
     beforeEach(() => {
@@ -27,16 +30,20 @@ describe('Get available times', () => {
         companyRepository = new InMemoryCompanyRepository()
         userCompanyRepository = new InMemoryUserCompanyRepository()
         scheduleRepository = new InMemoryScheduleRepository()
+        appointmentRepository = new InMemoryAppointmentRepository()
 
         sut = new GetAvailableTimes({
             scheduleRepository,
-            userCompanyRepository
+            userCompanyRepository,
+            appointmentRepository
         })
     })
 
     let user: User
     let company: Company
     let user_company: User_company
+
+    let clock: Sinon.SinonFakeTimers
 
     beforeEach(async () => {
         user = await userRepository.create({
@@ -52,6 +59,17 @@ describe('Get available times', () => {
             company_id: company.id,
             user_id: user.id
         })
+
+        clock = Sinon.useFakeTimers(set(new Date(), {
+            milliseconds: 0,
+            seconds: 0,
+            minutes: 0,
+            hours: 9
+        }));
+    })
+
+    afterEach(() => {
+        clock.restore()
     })
 
     it('should not show list if user company connection does not exists', async () => {
@@ -146,7 +164,36 @@ describe('Get available times', () => {
                 date: format(new Date(), 'MM/dd/yyyy'),
             })
 
-            expect(times.length).toEqual(9)
+            expect(times.length).toEqual(7)
+        })
+
+        it('should show none time correctly', async () => {
+            const dates = [
+                format(new Date(), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 1), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 2), 'MM/dd/yyyy'),
+            ].join(';')
+
+            await scheduleRepository.create({
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
+                dates,
+                duration_per_appointment: '01:00:00',
+                start_of_shift: '09:00:00',
+                end_of_shift: '10:00:00',
+                intervals: JSON.stringify([]),
+                name: 'Default schedule',
+                user_company_company_id: company.id,
+                user_company_user_id: user.id,
+                priority: 1
+            })
+
+            const { times } = await sut.execute({
+                user_id: user.id,
+                company_id: company.id,
+                date: format(new Date(), 'MM/dd/yyyy'),
+            })
+
+            expect(times.length).toEqual(0)
         })
 
         it('should show only one time correctly', async () => {
@@ -160,8 +207,8 @@ describe('Get available times', () => {
                 recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
                 dates,
                 duration_per_appointment: '01:00:00',
-                start_of_shift: '08:00:00',
-                end_of_shift: '09:00:00',
+                start_of_shift: '10:00:00',
+                end_of_shift: '11:00:00',
                 intervals: JSON.stringify([]),
                 name: 'Default schedule',
                 user_company_company_id: company.id,
@@ -232,11 +279,13 @@ describe('Get available times', () => {
                 priority: 1
             })
 
-            expect(sut.execute({
+            const { times } = await sut.execute({
                 user_id: user.id,
                 company_id: company.id,
                 date: format(new Date(), 'MM/dd/yyyy'),
-            })).rejects.toBeInstanceOf(AvailableTimeEmpty)
+            })
+
+            expect(times.length).toEqual(0)
         })
 
         it('should show correctly if there is more intervals', async () => {
@@ -278,7 +327,7 @@ describe('Get available times', () => {
                 date: format(new Date(), 'MM/dd/yyyy'),
             })
 
-            expect(times.length).toEqual(7)
+            expect(times.length).toEqual(5)
         })
 
         it('should show correctly if there is more intervals collapsing', async () => {
@@ -308,6 +357,77 @@ describe('Get available times', () => {
                 start_of_shift: '08:00:00',
                 end_of_shift: '17:00:00',
                 intervals: JSON.stringify(intervals),
+                name: 'Default schedule',
+                user_company_company_id: company.id,
+                user_company_user_id: user.id,
+                priority: 1
+            })
+
+            const { times } = await sut.execute({
+                user_id: user.id,
+                company_id: company.id,
+                date: format(new Date(), 'MM/dd/yyyy'),
+            })
+
+            expect(times.length).toEqual(5)
+        })
+
+        it('should not show time that already has an appointment', async () => {
+            const dates = [
+                format(new Date(), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 1), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 2), 'MM/dd/yyyy'),
+            ].join(';')
+
+            await scheduleRepository.create({
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
+                dates,
+                duration_per_appointment: '01:00:00',
+                start_of_shift: '08:00:00',
+                end_of_shift: '17:00:00',
+                intervals: JSON.stringify([]),
+                name: 'Default schedule',
+                user_company_company_id: company.id,
+                user_company_user_id: user.id,
+                priority: 1
+            })
+
+            const client = await userRepository.create({
+                name: 'John Client',
+                phone: '+12133734254'
+            })
+
+            await appointmentRepository.create({
+                time: parse('10:00:00', 'HH:mm:ss', new Date()),
+                title: 'Appointment title',
+                user_company_company_id: user_company.company_id,
+                user_company_user_id: user_company.user_id,
+                user_id: client.id
+            })
+
+            const { times } = await sut.execute({
+                user_id: user.id,
+                company_id: company.id,
+                date: format(new Date(), 'MM/dd/yyyy'),
+            })
+
+            expect(times.length).toEqual(6)
+        })
+
+        it('should only show times that starts after now', async () => {
+            const dates = [
+                format(new Date(), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 1), 'MM/dd/yyyy'),
+                format(addDays(new Date(), 2), 'MM/dd/yyyy'),
+            ].join(';')
+
+            await scheduleRepository.create({
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
+                dates,
+                duration_per_appointment: '01:00:00',
+                start_of_shift: '08:00:00',
+                end_of_shift: '17:00:00',
+                intervals: JSON.stringify([]),
                 name: 'Default schedule',
                 user_company_company_id: company.id,
                 user_company_user_id: user.id,
@@ -380,11 +500,13 @@ describe('Get available times', () => {
                 priority: 1
             })
 
-            await expect(sut.execute({
+            const { times } = await sut.execute({
                 user_id: user.id,
                 company_id: company.id,
                 date: format(addDays(new Date(), 2), 'MM/dd/yyyy'),
-            })).rejects.toBeInstanceOf(AvailableTimeEmpty)
+            })
+
+            await expect(times.length).toEqual(0)
         })
 
         it('should show only if date is the same as day of week', async () => {
@@ -488,7 +610,7 @@ describe('Get available times', () => {
                 date: '02/20/2024',
             })
 
-            expect(times.length).toEqual(9)
+            expect(times.length).toEqual(7)
         })
 
         it('should show only the times of the day available', async () => {
@@ -537,7 +659,7 @@ describe('Get available times', () => {
             expect(times.length).toEqual(9)
         })
 
-        it('should show correctly considering fisrt has intervals', async () => {
+        it('should show correctly considering first has intervals', async () => {
             const dates = [
                 '02/18/2024',
                 '02/22/2024',
@@ -588,7 +710,7 @@ describe('Get available times', () => {
                 date: '02/20/2024',
             })
 
-            expect(times.length).toEqual(8)
+            expect(times.length).toEqual(6)
         })
 
         it('should show correctly considering second has intervals', async () => {
@@ -642,7 +764,7 @@ describe('Get available times', () => {
                 date: '02/20/2024',
             })
 
-            expect(times.length).toEqual(8)
+            expect(times.length).toEqual(6)
         })
 
         it('should show correctly considering both have intervals', async () => {
@@ -705,7 +827,62 @@ describe('Get available times', () => {
                 date: '02/20/2024',
             })
 
-            expect(times.length).toEqual(7)
+            expect(times.length).toEqual(5)
+        })
+
+        it('should show correctly considering both have same intervals', async () => {
+            const dates = [
+                '02/18/2024',
+                '02/22/2024',
+            ].join(';')
+
+
+            const intervals: Interval[] = [
+                {
+                    start: '12:00:00',
+                    duration: '01:00:00',
+                    name: 'Lunch',
+                }
+            ]
+
+            await scheduleRepository.create({
+                recurrency_type: $Enums.RECURRENCY_TYPE.INTERVAL_OF_DATES,
+                dates,
+                duration_per_appointment: '01:00:00',
+                start_of_shift: '08:00:00',
+                end_of_shift: '17:00:00',
+                intervals: JSON.stringify(intervals),
+                name: 'Default schedule',
+                user_company_company_id: company.id,
+                user_company_user_id: user.id,
+                priority: 1
+            })
+
+            const dates_2 = [
+                '02/20/2024',
+                '02/26/2024',
+            ].join(';')
+
+            await scheduleRepository.create({
+                recurrency_type: $Enums.RECURRENCY_TYPE.DATE,
+                dates: dates_2,
+                duration_per_appointment: '02:00:00',
+                start_of_shift: '08:00:00',
+                end_of_shift: '17:00:00',
+                intervals: JSON.stringify(intervals),
+                name: 'Default schedule',
+                user_company_company_id: company.id,
+                user_company_user_id: user.id,
+                priority: 2
+            })
+
+            const { times } = await sut.execute({
+                company_id: company.id,
+                user_id: user.id,
+                date: '02/20/2024',
+            })
+
+            expect(times.length).toEqual(6)
         })
     })
 

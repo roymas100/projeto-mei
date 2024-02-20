@@ -2,10 +2,12 @@ import { $Enums } from "@prisma/client"
 import type { ScheduleRepository } from "../repositories/schedule.repository"
 import type { UserCompanyRepository } from "../repositories/user-company.repository"
 import { UserCompanyDoesNotExists } from "./errors/UserCompanyDoesNotExists.error"
-import { endOfDay, isWithinInterval, parse, startOfDay, isValid, isSameDay, add, isBefore, areIntervalsOverlapping, isSameHour, isSameMinute, isSameSecond } from "date-fns"
+import { endOfDay, isWithinInterval, parse, startOfDay, isValid, isSameDay, add, isBefore, areIntervalsOverlapping, isSameHour, isSameMinute, isSameSecond, isAfter } from "date-fns"
 import { ErrorFormattingField } from "./errors/ErrorFormattingField.error"
 import { NoSchedulesConfigured } from "./errors/NoSchedulesConfigured.error"
 import { AvailableTimeEmpty } from "./errors/AvailableTimeEmpty.error"
+import type { AppointmentRepository } from "../repositories/appointment.repository"
+import { isSameDates, isSameOrBefore } from "../utils/isSameDates"
 
 interface Time_Intervals {
     start: Date,
@@ -15,22 +17,20 @@ interface Time_Intervals {
 export class GetAvailableTimes {
     private userCompanyRepository: UserCompanyRepository
     private scheduleRepository: ScheduleRepository
+    private appointmentRepository: AppointmentRepository
 
     constructor({
         userCompanyRepository,
-        scheduleRepository
+        scheduleRepository,
+        appointmentRepository
     }: {
         userCompanyRepository: UserCompanyRepository
         scheduleRepository: ScheduleRepository
+        appointmentRepository: AppointmentRepository
     }) {
         this.userCompanyRepository = userCompanyRepository
         this.scheduleRepository = scheduleRepository
-    }
-
-    private isSameOrBefore(first: Date, second: Date) {
-        const isSameDate = isSameDay(first, second) && isSameHour(first, second) && isSameMinute(first, second) && isSameSecond(first, second)
-
-        return isBefore(first, second) || isSameDate
+        this.appointmentRepository = appointmentRepository
     }
 
     async execute({
@@ -134,6 +134,17 @@ export class GetAvailableTimes {
             }
         })
 
+        const appointments = await this.appointmentRepository.find({
+            where: {
+                time: {
+                    gte: startOfShift,
+                    lt: endOfShift
+                },
+                user_company_user_id: user_id,
+                user_company_company_id: company_id
+            }
+        })
+
         const times: Time_Intervals[] = []
         let processing = true
         let startOfNextTime: Date = startOfShift
@@ -163,17 +174,16 @@ export class GetAvailableTimes {
                     })
                 }
 
-                if (this.isSameOrBefore(time.end, endOfShift)) {
+                if (isSameOrBefore(time.end, endOfShift)) {
                     startOfNextTime = time.end
-                    times.push(time)
+                    const hasAppointmentInHour = appointments.some(app => isSameDates(app.time, time.start))
+                    if (!hasAppointmentInHour && isAfter(time.start, new Date())) {
+                        times.push(time)
+                    }
                 } else {
                     processing = false
                 }
             }
-        }
-
-        if (!times.length) {
-            throw new AvailableTimeEmpty()
         }
 
         return { times }

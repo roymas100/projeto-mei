@@ -14,8 +14,7 @@
 //     })
 // }
 
-import { parse } from "date-fns";
-
+import { addHours } from "date-fns";
 
 // const data = [
 //     {
@@ -40,4 +39,4 @@ import { parse } from "date-fns";
 //     cebolas: 'desc'
 // }))
 
-console.log(parse('Sat', 'eee', new Date()))
+console.log(addHours(new Date(), 1) < new Date())

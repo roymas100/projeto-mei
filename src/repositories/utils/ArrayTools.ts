@@ -2,9 +2,11 @@ interface K {
     [k: string]: unknown
 }
 
-interface Filter {
-    gt?: any
-    gte?: any
+interface Filter<Scheme> {
+    gt?: Partial<Scheme>
+    gte?: Partial<Scheme>
+    lt?: Partial<Scheme>
+    lte?: Partial<Scheme>
     // equals?: string | 
     // in?: string[] | 
     // notIn?: string[] | 
@@ -17,8 +19,8 @@ interface Filter {
     // not?: NestedStringFilter<$PrismaModel> | string
 }
 
-interface Where {
-    [K: string]: string | Date | number | boolean | Filter
+interface Where<Scheme> {
+    [K: string]: string | Date | number | boolean | Filter<Scheme>
 }
 
 interface OrderBy {
@@ -58,20 +60,29 @@ export class ArrayTools<Scheme extends K> {
         })
     }
 
-    private where(items: Scheme[], where: Where) {
+    private where(items: Scheme[], where: Where<Scheme>) {
         const newItems = items.filter(item => {
             let pass = true
 
             for (const key in where) {
                 if (typeof where[key] === 'object') {
-                    const filter = where[key] as Filter
+                    const filter = where[key] as Filter<Scheme>
                     for (const filterKey in filter) {
+                        const filter_key = filterKey as keyof Filter<Scheme>
+                        const filterValue = filter[filter_key] as Partial<Scheme>
+
                         switch (filterKey) {
                             case 'gte':
-                                pass = pass && item[key as keyof Scheme] >= filter[filterKey]
+                                pass = pass && item[key as keyof Scheme] >= filterValue
                                 break;
                             case 'gt':
-                                pass = pass && item[key as keyof Scheme] > filter[filterKey]
+                                pass = pass && item[key as keyof Scheme] > filterValue
+                                break;
+                            case 'lte':
+                                pass = pass && item[key as keyof Scheme] <= filterValue
+                                break;
+                            case 'lt':
+                                pass = pass && item[key as keyof Scheme] < filterValue
                                 break;
                             default:
                                 break;
@@ -80,8 +91,6 @@ export class ArrayTools<Scheme extends K> {
                 } else {
                     pass = pass && item[key] === where[key]
                 }
-
-
             }
 
             return pass

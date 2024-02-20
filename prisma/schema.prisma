@@ -22,7 +22,7 @@ model User {
   has_confirmed_phone Boolean        @default(false)
   confirmation_token  Int?
   token_expiration    DateTime?
-  appointments        Appointments[]
+  appointments        Appointment[]
   user_company        User_company[]
 
   current_company    Company? @relation(fields: [current_company_id], references: [id])
@@ -47,11 +47,11 @@ enum COMPANY_ROLE {
 }
 
 model User_company {
-  role         COMPANY_ROLE   @default(EMPLOYEE)
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
+  role         COMPANY_ROLE  @default(EMPLOYEE)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
   deleted_at   DateTime?
-  appointments Appointments[]
+  appointments Appointment[]
   schedules    Schedule[]
 
   user       User    @relation(fields: [user_id], references: [id])
@@ -62,12 +62,12 @@ model User_company {
   @@id([user_id, company_id])
 }
 
-model Appointments {
+model Appointment {
   id                      String       @id @default(uuid())
   created_at              DateTime     @default(now())
   updated_at              DateTime     @updatedAt
   deleted_at              DateTime?
-  name                    String
+  title                   String
   time                    DateTime
   cancellation_url        String?
   user                    User         @relation(fields: [user_id], references: [id])
