@@ -18,6 +18,7 @@ import { TimeIsNotAvailable } from "../errors/TimeIsNotAvailable.error";
 import { AppointmentPastTime } from "../errors/AppointmentPastTime.error";
 import { AppointmentTimeTaken } from "../errors/AppointmentTimeTaken.error";
 import Sinon from "sinon";
+import { env } from "bun";
 
 describe('Create Appointment use case', () => {
     let userRepository: UserRepository
@@ -75,7 +76,7 @@ describe('Create Appointment use case', () => {
         })
 
         const dates = [
-            format(new Date(), 'MM/dd/yyyy'),
+            '02/20/2024',
         ].join(';')
 
 
@@ -101,6 +102,9 @@ describe('Create Appointment use case', () => {
     describe('Test if now is 9 am', () => {
         beforeEach(() => {
             clock = Sinon.useFakeTimers(set(new Date(), {
+                date: 20,
+                month: 1, // February
+                year: 2024,
                 milliseconds: 0,
                 seconds: 0,
                 minutes: 0,
@@ -206,13 +210,16 @@ describe('Create Appointment use case', () => {
                 user_company_user_id: user_company.user_id,
             })
 
-            expect(appointment.cancellation_url).toEqual('//')
+            expect(appointment.cancellation_url).toEqual(`${env.CANCELLATION_URL}/${appointment.id}`)
         })
     })
 
     describe('Test if now is 0 am', () => {
         beforeEach(() => {
             clock = Sinon.useFakeTimers(set(new Date(), {
+                date: 20,
+                month: 1, // February
+                year: 2024,
                 milliseconds: 0,
                 seconds: 0,
                 minutes: 0,
@@ -301,6 +308,9 @@ describe('Create Appointment use case', () => {
     describe('Test if now is 23 pm', () => {
         beforeEach(() => {
             clock = Sinon.useFakeTimers(set(new Date(), {
+                date: 20,
+                month: 1, // February
+                year: 2024,
                 milliseconds: 0,
                 seconds: 0,
                 minutes: 0,

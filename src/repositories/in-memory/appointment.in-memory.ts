@@ -5,11 +5,12 @@ import type { DefaultArgs } from "@prisma/client/runtime/library";
 import { ArrayTools } from "../utils/ArrayTools";
 
 export class InMemoryAppointmentRepository implements AppointmentRepository {
+
     items: Appointment[] = []
 
     async create(data: Prisma.AppointmentUncheckedCreateInput): Promise<Appointment> {
         const appointment: Appointment = {
-            id: randomUUID(),
+            id: data.id || randomUUID(),
             title: data.title,
             time: new Date(data.time),
             cancellation_url: data.cancellation_url || null,
@@ -38,6 +39,10 @@ export class InMemoryAppointmentRepository implements AppointmentRepository {
         })
     }
 
+    async findById(id: string): Promise<Appointment | null> {
+        return this.items.find(item => item.id === id) || null
+    }
+
     async transactionFind(payload: AppointmentTransactionFind[]): Promise<Appointment[]> {
         const appointments_all: Appointment[] = []
 
@@ -53,4 +58,13 @@ export class InMemoryAppointmentRepository implements AppointmentRepository {
 
         return appointments_all
     }
+
+    async delete(appointment_id: string): Promise<Appointment> {
+        const index = this.items.findIndex(item => item.id === appointment_id)
+
+        const [appointment] = this.items.splice(index, 1)
+
+        return appointment
+    }
+
 }

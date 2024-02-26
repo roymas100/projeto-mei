@@ -61,6 +61,9 @@ describe('Get available times', () => {
         })
 
         clock = Sinon.useFakeTimers(set(new Date(), {
+            date: 20,
+            month: 1, // February
+            year: 2024,
             milliseconds: 0,
             seconds: 0,
             minutes: 0,

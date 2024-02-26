@@ -7,5 +7,7 @@ export interface AppointmentTransactionFind {
 export interface AppointmentRepository {
     create(data: Prisma.AppointmentUncheckedCreateInput): Promise<Appointment>
     find(appointmentArgs: Prisma.AppointmentFindFirstArgs): Promise<Appointment[]>
+    findById(appointment_id: string): Promise<Appointment | null>
     transactionFind(payload: AppointmentTransactionFind[]): Promise<Appointment[]>
+    delete(appointment_id: string): Promise<Appointment>
 }

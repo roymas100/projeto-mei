@@ -26,6 +26,7 @@ export class InMemoryUserRepository implements UserRepository {
             created_at: new Date(),
             updated_at: new Date(),
             deleted_at: data.deleted_at ? new Date(data.deleted_at) : null,
+            current_company_id: null
         }
 
         this.items.push(user)

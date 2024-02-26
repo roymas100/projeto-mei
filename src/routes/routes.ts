@@ -13,6 +13,8 @@ import { patchSchedule, patchScheduleBodySchema, patchScheduleParamsSchema } fro
 import { getSchedule, getScheduleParamsSchema } from "./controllers/get-schedule"
 import { deleteSchedule, deleteScheduleParamsSchema } from "./controllers/delete-schedule"
 import { getAvailableTimes, getAvailableTimesParamsSchema, getAvailableTimesQuerySchema } from "./controllers/get-available-times"
+import { makeAppointment, makeAppointmentBodySchema } from "./controllers/make-appointment"
+import { cancelAppointment, cancelAppointmentParamsSchema } from "./controllers/cancel-appointment"
 
 const globalPlugins = new Elysia().use(plugins.pre_render_plugins)
 
@@ -188,6 +190,19 @@ const dashboardRoutes = new Elysia().use(globalPlugins).guard({}, (app) =>
 
 )
 
+const clientRoutes = new Elysia().use(globalPlugins)
+    .post('/make-appointment', ({ body }) => makeAppointment({
+        body
+    }), {
+        body: makeAppointmentBodySchema
+    })
+    .post('/cancel-appointment/:appointment_id', ({ params }) => cancelAppointment({
+        params
+    }), {
+        params: cancelAppointmentParamsSchema
+    })
+
 export const routes = new Elysia()
     .use(authenticationRoutes)
     .use(dashboardRoutes)
+    .use(clientRoutes)

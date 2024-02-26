@@ -9,6 +9,8 @@ import { UserCompanyDoesNotExists } from "../errors/UserCompanyDoesNotExists.err
 import { TimeIsNotAvailable } from "../errors/TimeIsNotAvailable.error";
 import { AppointmentPastTime } from "../errors/AppointmentPastTime.error";
 import { AppointmentTimeTaken } from "../errors/AppointmentTimeTaken.error";
+import { env } from "bun";
+import { randomUUID } from "crypto";
 
 export class MakeAppointment {
     private appointmentRepository: AppointmentRepository
@@ -32,6 +34,19 @@ export class MakeAppointment {
         this.appointmentRepository = appointmentRepository
         this.getAvailableTimes = getAvailableTimes
     }
+
+    private async findAvailableId(): Promise<string> {
+        const id = randomUUID()
+
+        const appointmentExist = await this.appointmentRepository.findById(id)
+
+        if (appointmentExist) {
+            return this.findAvailableId()
+        }
+
+        return id
+    }
+
 
     async execute({
         title,
@@ -96,12 +111,16 @@ export class MakeAppointment {
             throw new TimeIsNotAvailable()
         }
 
+        const id = await this.findAvailableId()
+
         const appointment = await this.appointmentRepository.create({
+            id,
             title,
             time,
             user_company_company_id,
             user_company_user_id,
-            user_id: client_id
+            user_id: client_id,
+            cancellation_url: `${env.CANCELLATION_URL}/${id}`
         })
 
         return {
