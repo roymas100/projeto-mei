@@ -1,5 +1,5 @@
 > [!WARNING]  
-> This project is current in development. Some of the expected funcinalities can be missing.
+> This project is current in development. Some of the expected functionalities can be missing.
 
 # projeto-mei
 
