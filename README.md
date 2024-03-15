@@ -17,6 +17,18 @@ This is a schedule api to be implemented in a later website.
 
 Swagger link (not yet release on cloud)
 
+## Technologies
+
+- Node.js
+- Prisma
+- Typescript
+- Vitest
+- Postgesql
+- Docker
+- TDD
+- Splite api (not implemented)
+- Whatsapp api (not implemented)
+
 ## How to run
 
 To use development server for the first time, run:
